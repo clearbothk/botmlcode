@@ -1,6 +1,15 @@
 # Clearbot Jetson Nano Codebase
 
+### Requirements
+
+- OpenCV (latest version from the repo: see setup instructions for details)
+- Git and Git LFS (LFS is used for weights file)
+- Python 3.6 or above
+
+##### When cloning this repository, make sure that you have Git LFS to pull the weights file. Otherwise you will get an error on running the code.
+
 ### How to setup and run this code?
+
 Make sure that OpenCV has been compiled and installed.
 
 ##### Note ( 19th June, 2020): OpenCV needs to be compiled because the YOLOv4 requires features that are scheduled in a future release. [Track the issue here](https://github.com/opencv/opencv/pull/17185)
@@ -20,7 +29,6 @@ source .venv/bin/activate
 Make sure that you have compiled OpenCV using the command `make`. You DO NOT need to run `make install` for this to work.
 
 Also make sure that you installed a Python virtual environment for this project.
-
 
 Let us assume that the path to the `opencv/build` directory is `$OPENCV`
 
