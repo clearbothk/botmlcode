@@ -57,3 +57,24 @@ python yolo_object_detection.py -y model
 ```
 
 This should pull up a screen with the live feed from the camera.
+
+#### OpenCV compile CMake
+
+```shell script
+cmake -D CMAKE_BUILD_TYPE=RELEASE \
+	-D WITH_CUDA=ON \
+	-D CUDA_ARCH_PTX="" \
+	-D CUDA_ARCH_BIN="5.3,6.2,7.2" \
+	-D WITH_CUBLAS=ON \
+	-D WITH_LIBV4L=ON \
+	-D BUILD_opencv_python3=ON \
+	-D BUILD_opencv_python2=OFF \
+	-D BUILD_opencv_java=OFF \
+	-D WITH_GSTREAMER=ON \
+	-D WITH_GTK=ON \
+	-D BUILD_TESTS=OFF \
+	-D BUILD_PERF_TESTS=OFF \
+	-D BUILD_EXAMPLES=OFF \
+	-D OPENCV_ENABLE_NONFREE=ON \
+	-D OPENCV_EXTRA_MODULES_PATH=/home/`whoami`/opencv_contrib/modules ..
+```
