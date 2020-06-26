@@ -10,7 +10,8 @@ class Detector:
 	LABELS = None
 	ln = None
 
-	def __init__(self, model_path, use_gpu=False, confidence_thres=0.5, nms_thres=0.3):
+	def __init__(self, model_path, use_gpu=False, confidence_thres=0.5, nms_thres=0.3, weights_file="clearbot.weights",
+	             config_file="clearbot.cfg", names_file="clearbot.names"):
 		"""
 		Initialise a instance for YOLOv4 object detection.
 		:param model_path: The path of the model relative to the python script
@@ -21,11 +22,11 @@ class Detector:
 		self.confidence_threshold = confidence_thres
 		self.nms_threshold = nms_thres
 		# initialize a list of colors to represent each possible class label
-		labels_path = os.path.sep.join([model_path, "clearbot.names"])
+		labels_path = os.path.sep.join([model_path, names_file])
 		self.LABELS = open(labels_path).read().strip().split("\n")
 
-		weights_path = os.path.sep.join([model_path, "clearbot_26_06_20.weights"])
-		config_path = os.path.sep.join([model_path, "clearbot.cfg"])
+		weights_path = os.path.sep.join([model_path, weights_file])
+		config_path = os.path.sep.join([model_path, config_file])
 		print("[INFO] loading YOLO from disk...")
 		self.net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
 
@@ -117,11 +118,10 @@ class Detector:
 				})
 		return result
 
-
 # Sample code for using object detection
 # print("[INFO] accessing video stream...")
 # vs = cv2.VideoCapture(0)
-# detector = Detector("model", use_gpu=True)
+# detector = Detector("model", use_gpu=True, weights_file="clearbot_26_06_20.weights")
 # while True:
 # 	(grabbed, frame) = vs.read()
 # 	if not grabbed:
