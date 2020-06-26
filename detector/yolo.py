@@ -22,11 +22,11 @@ class Detector:
 		self.confidence_threshold = confidence_thres
 		self.nms_threshold = nms_thres
 		# initialize a list of colors to represent each possible class label
-		labels_path = os.path.sep.join([model_path, names_file])
+		labels_path = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), model_path, names_file])
 		self.LABELS = open(labels_path).read().strip().split("\n")
 
-		weights_path = os.path.sep.join([model_path, weights_file])
-		config_path = os.path.sep.join([model_path, config_file])
+		weights_path = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), model_path, weights_file])
+		config_path = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), model_path, config_file])
 		print("[INFO] loading YOLO from disk...")
 		self.net = cv2.dnn.readNetFromDarknet(config_path, weights_path)
 

@@ -1,8 +1,9 @@
 import json
 
-from Location import Location
-from Confidence import Confidence
-from Label import Label
+from .Location import Location
+from .Confidence import Confidence
+from .Label import Label
+
 
 class Report:
     def __init__(self, label, confidence, location):
@@ -42,4 +43,3 @@ class Report:
 #report.create_report()
 #report.print_report()
 #report.write_report('report_folder/report.json')
-    

@@ -4,4 +4,3 @@ class Location:
     
     def get_coordinate(self):
         return self.x
-    
