@@ -1,31 +1,31 @@
-import asyncio
+#import asyncio
 import sys
 import os
 import time
 
 
-sys.path.insert(1, "/botmlcode/")
+sys.path.insert(0, "/botmlcode/")
 
-from yolo_object_detection import yolo_object_detection
-from pixhawk import pixhawk
+#from yolo_object_detection import yolo_object_detection
+from pixhawk import Pixhawk
 from report import Report 
 
-yolo_object_detection.run()
-
+#yolo_object_detection.run()
+#time.sleep(60)
+count = 0
 while True:
-    if (yolo_object_detection.detected):
-        pixhawk.run()
-        time.sleep(10)
-        location_pixhawk = pixhawk.vehicle.do_capture_global_location()
-        label_yolo = yolo_object_detection.LABEL 
-        confidence_yolo = yolo_object_detection.confidence
-        report = Report(label_yolo, confidence_yolo, location_pixhawk)
+    if (count % 2)==0:
+        pixhawk = Pixhawk()
+        location_pixhawk = pixhawk.do_capture_global_location()
+        #label_yolo = yolo_object_detection.LABEL() 
+        #confidence_yolo = yolo_object_detection.confidence()
+        report = Report("litter", 97, str(location_pixhawk))
         report.create_report()
         report.print_report()
         report.write_report('report_folder/report.json')
-
-    else:
-        pass
+        time.sleep(10)
+    count += 1
+    
     
     
 

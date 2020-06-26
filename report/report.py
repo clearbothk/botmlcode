@@ -8,7 +8,7 @@ class Report:
     def __init__(self, label, confidence, location):
         self.label = Label(label)
         self.confidence = Confidence(confidence)
-        self.location = Location(location[0], location[1])
+        self.location = Location(location)
         self.report = {}
 
     def create_report(self):

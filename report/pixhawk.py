@@ -1,16 +1,24 @@
-try:
-    from dronekit import connect, VehicleMode, LocationGlobalRelative
-except:
-    print("No module named dronekit, try to establish connection between jetson nano and mission planner")
-    exit(0)
+#try:
+#    from dronekit import connect, VehicleMode, LocationGlobalRelative
+#except:
+#    print("No module named dronekit, try to establish connection between jetson nano and mission planner")
+#    exit(0)
 
 # Connect to the Vehicle
-vehicle = connect('/dev/ttyTHS1', wait_ready=True, baud=57600)
+#vehicle = connect('/dev/ttyTHS1', wait_ready=True, baud=57600)
 
+#vehicle.mode = VehicleMode("MANUAL")
+#vehicle.armed = True
+#from dronekit import connect, VehicleMode, LocationGlobalRelative
+from dronekit import connect, VehicleMode, LocationGlobalRelative
+vehicle = connect('/dev/ttyTHS1', wait_ready=True, baud=57600)
 vehicle.mode = VehicleMode("MANUAL")
 vehicle.armed = True
-
-class pixhawk:
+class Pixhawk:
+    def __init__(self):
+        pass
+        
+        
     def firmware_version(self):
         return vehicle.version
 
