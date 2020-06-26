@@ -8,7 +8,7 @@ sys.path.insert(1, "/botmlcode/")
 
 
 from yolo_object_detection import yolo_object_detection
-from dronekit import dronekit
+from pixhawk import pixhawk
 
 def run():
     os.system('python /botmlcode/yolo_object_detection.py')
