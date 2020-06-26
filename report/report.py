@@ -17,7 +17,6 @@ class Report:
             "confidence": self.confidence.get_confidence(),
             "location": self.location.get_coordinate()
         }
-        
         self.report = report
 
     def print_report(self):
@@ -25,7 +24,8 @@ class Report:
 
     def write_report(self, path):
         with open(path, 'a') as file_stream:
-            json.dump(self.report, file_stream)
+            json.dump(self.report, file_stream, indent=4, sort_keys= True)
+
 
 
     #def get_label(self):

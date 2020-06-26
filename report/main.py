@@ -23,7 +23,8 @@ while True:
         report.create_report()
         report.print_report()
         report.write_report('report_folder/report.json')
-        time.sleep(10)
+        
+        time.sleep(5)
     count += 1
     
     
