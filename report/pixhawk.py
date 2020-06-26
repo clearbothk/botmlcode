@@ -10,7 +10,7 @@ vehicle = connect('/dev/ttyTHS1', wait_ready=True, baud=57600)
 vehicle.mode = VehicleMode("MANUAL")
 vehicle.armed = True
 
-class test1():
+class pixhawk:
     def firmware_version(self):
         return vehicle.version
 

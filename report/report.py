@@ -37,9 +37,9 @@ class Report:
     #def get_location(self):
     #    return test1.do_capture_relative_global_location(self)
 
-report = Report("metal", 98.5, (102, 71))
-report.print_report()
-report.create_report()
-report.print_report()
-report.write_report('report_folder/report.json')
+#report = Report("metal", 98.5, (102, 71))
+#report.print_report()
+#report.create_report()
+#report.print_report()
+#report.write_report('report_folder/report.json')
     
