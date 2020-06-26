@@ -48,15 +48,7 @@ Now, for the last step, make sure that you have `.venv` active using the command
 
 If the above runs without errors, you have installed things correctly.
 
-#### Running the code on the Jetson Nano for detection
-
-To run the detection, use the commands:
-
-```bash
-python yolo_object_detection.py -y model
-```
-
-This should pull up a screen with the live feed from the camera.
+### Misc instructions if you have not compiled OpenCV yet
 
 #### OpenCV compile CMake
 
