@@ -1,7 +1,7 @@
 class Confidence:
-    def __init__(self, i):
-        self.i = i
+    def __init__(self, y):
+        self.y = y[1]
     
     def get_confidence(self):
-        return self.i
+        return self.y
     

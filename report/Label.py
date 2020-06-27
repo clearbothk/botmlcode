@@ -1,6 +1,6 @@
 class Label:
-    def __init__(self, z):
-        self.z = z
+    def __init__(self, x):
+        self.x = x[0]
     
     def get_label(self):
-        return self.z
+        return self.x
