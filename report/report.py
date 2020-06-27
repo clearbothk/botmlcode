@@ -1,8 +1,12 @@
 import json
 
-from .Location import Location
-from .Confidence import Confidence
-from .Label import Label
+#from .Location import Location
+#from .Confidence import Confidence
+#from .Label import Label
+
+from Location import Location
+from Confidence import Confidence
+from Label import Label
 
 
 class Report:
@@ -24,7 +28,7 @@ class Report:
         print(self.report)
 
     def write_report(self, path):
-        with open(path, 'a') as file_stream:
+        with open(path, 'w') as file_stream:
             json.dump(self.report, file_stream, indent=4, sort_keys= True)
 
 
@@ -38,7 +42,7 @@ class Report:
     #def get_location(self):
     #    return test1.do_capture_relative_global_location(self)
 
-#report = Report("metal", 98.5, (102, 71))
+#report = Report("metal", 98.5, "hi")
 #report.print_report()
 #report.create_report()
 #report.print_report()

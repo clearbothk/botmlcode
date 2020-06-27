@@ -1,6 +1,5 @@
 from dronekit import connect, VehicleMode, LocationGlobalRelative
 
-
 class Pixhawk:
     vehicle = None
 

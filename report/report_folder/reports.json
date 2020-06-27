@@ -1,0 +1,19 @@
+{
+    "Clearbot": [
+        {
+            "confidence": 97,
+            "label": "litter",
+            "location": "hello"
+        },
+        {
+            "confidence": 97,
+            "label": "litter",
+            "location": "hello"
+        },
+        {
+            "confidence": 97,
+            "label": "litter",
+            "location": "hello"
+        }
+    ]
+}
