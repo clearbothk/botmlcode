@@ -7,6 +7,7 @@ class Pixhawk:
         self.vehicle = connect(connection_port, wait_ready=True, baud=baud)
         self.vehicle.mode = VehicleMode("MANUAL")
         self.vehicle.armed = True
+        self.result = []
 
     def firmware_version(self):
         return self.vehicle.version
@@ -50,7 +51,7 @@ class Pixhawk:
     def range_finder(self):
         return self.vehicle.rangefinder
 
-    def range_finder_distance(self):
+    def  range_finder_distance(self):
         return self.vehicle.rangefinder.distance
 
     def range_finder_voltage(self):
@@ -70,6 +71,31 @@ class Pixhawk:
 
     def check_vehicle_armed(self):
         return self.vehicle.armed
+    
+    def get_data(self):
+        result.append({
+			"firmware_version" : firmware_version(),
+			"vehicle_capabilities" : vehicle_capabilities(),
+			"location" :do_capture_global_location(),
+            "altitude" : do_capture_altitude(),
+            "velocity" : do_capture_velocity(),
+            "gps" : do_capture_gps(),
+            "ground_speed" : do_capture_ground_speed(),
+            "air_speed" : do_capture_air_speed(),
+            "gimbal_status" : gimbal_status(),
+            "battery_status" : battery_status(),
+            "EKF_OK" : EKF_OK(),
+            "last_heartbeat" : last_heartbeat(),
+            "range_finder_distance" : range_finder_distance(),
+            "range_finder_voltage" : range_finder_voltage(),
+            "heading" : heading(),
+            "vehicle_is_armable" : vehicle_is_armable(),
+            "system_status" : system_status(),
+            "vehicle_mode_name" : vehicle_mode_name(),
+            "check_vehicle_armed" : check_vehicle_armed()
+		})
+        self.result = result
+        return result
 
     def debug(self):
         print('Autopilot Firmware version: %s' % self.vehicle.version)
