@@ -1,5 +1,23 @@
 {
-    "confidence": 97,
-    "label": "litter",
-    "location": "hello"
+    "EKF_OK": false,
+    "air_speed": 0.0,
+    "attitude": "Attitude:pitch=-0.06688760966062546,yaw=0.8089165091514587,roll=-0.42657241225242615",
+    "battery_status": "Battery:voltage=0.0,current=None,level=None",
+    "check_vehicle_armed": false,
+    "confidence": 0.5623620748519897,
+    "firmware_version": "APM:UnknownVehicleType11-4.0.0",
+    "gimbal_status": "Gimbal: pitch=0.0, roll=0.0, yaw=0.0",
+    "gps": "GPSInfo:fix=1,num_sat=0",
+    "ground_speed": 0.0,
+    "heading": 46,
+    "label": "Egg carton",
+    "last_heartbeat": 0.1956399999999121,
+    "location": "LocationGlobal:lat=0.0,lon=0.0,alt=0.0",
+    "range_finder_distance": "None",
+    "range_finder_voltage": "None",
+    "system_status": "CRITICAL",
+    "vehicle_capabilities": "True",
+    "vehicle_is_armable": false,
+    "vehicle_mode_name": "MANUAL",
+    "velocity": "[0.0, 0.0, 0.0]"
 }

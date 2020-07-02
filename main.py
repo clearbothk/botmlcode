@@ -1,5 +1,6 @@
 import time
 import cv2
+
 from detector import yolo
 from report import report
 from report import reports
@@ -9,7 +10,7 @@ report_path = 'report/report_folder/report.json'
 reports_path = 'report/report_folder/reports.json'
 
 print("[INFO] accessing video stream...")
-vs = cv2.VideoCapture(1)
+vs = cv2.VideoCapture(0)
 detector = yolo.Detector("model", use_gpu=True, weights_file="clearbot_26_06_20.weights")
 
 reports = reports.Reports()
@@ -21,18 +22,19 @@ while True:
 		break
 	result = detector.detect(frame)
 	current = len(result)
-	if (current > 0 and current > previous):
+	print(result)
+	if (current > 0):
 		result_object = result[current - 1]
-		pixhawk = pixhawk.Pixhawk()
-		pixhawk_data = pixhawk.get_data()
+		pixhawk_init = pixhawk.Pixhawk()
+		pixhawk_data = pixhawk_init.get_data()
+		print(pixhawk_data)
 		yolo_result = result_object
-		report = report.Report(yolo_result, pixhawk_data)
-		report.create_report()
-		report.print_report()
-		report.write_report(report_path)
+		get_report = report.Report(yolo_result, pixhawk_data)
+		get_report.create_report()
+		get_report.print_report()
+		get_report.write_report(report_path)
 		reports.combine(reports_path)
-		previous = current
-		time.sleep(5)
+		
 # from detector import yolo
 # import cv2
 

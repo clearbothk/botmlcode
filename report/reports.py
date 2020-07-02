@@ -1,7 +1,7 @@
 from pathlib import Path
 import json
 
-data_folder = Path("report_folder/")
+data_folder = Path("report/report_folder/")
 file_to_open = data_folder / "report.json"
 
 class Reports:
