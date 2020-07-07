@@ -32,7 +32,7 @@ while True:
 		yolo_result = result_object
 
 		#post to thingspeak.com
-		visualize = thing_speak.Thing_speak(yolo_result, pixhawk_data))
+		visualize = thing_speak.Thing_speak(yolo_result, pixhawk_data)
 		visualize.show_thingspeak()
 
 		#saved to reports.json
