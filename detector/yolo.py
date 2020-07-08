@@ -21,7 +21,7 @@ class Detector:
 		"""
 		self.confidence_threshold = confidence_thres
 		self.nms_threshold = nms_thres
-		# initialize a list of colors to represent each possible class label
+
 		labels_path = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), model_path, names_file])
 		self.LABELS = open(labels_path).read().strip().split("\n")
 
