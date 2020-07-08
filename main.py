@@ -2,6 +2,7 @@ import time
 import argparse
 import logging
 from serial import serialutil
+from imutils.video import FPS
 import cv2
 
 from detector import yolo
@@ -29,6 +30,9 @@ vs = cv2.VideoCapture(0)
 detector = yolo.Detector("model", use_gpu=True)
 
 reports = reports.Reports()
+
+
+fps = FPS().start()
 
 while True:
 	(grabbed, frame) = vs.read()
@@ -70,10 +74,15 @@ while True:
 			# to the Pixhawk
 			logging.error(e)
 
-	cv2.imshow("Clearbot", frame)
-	# If this is not there, frame will not actually show: I did not dig into the explanation
-	if cv2.waitKey(1) & 0xFF == ord('q'):
-		break
+	if args.video_out:
+		cv2.imshow("Clearbot", frame)
+		# If this is not there, frame will not actually show: I did not dig into the explanation
+		if cv2.waitKey(1) & 0xFF == ord('q'):
+			break
 
+	fps.update()
+
+fps.stop()
+logging.info("approx. FPS: {:.2f}".format(fps.fps()))
 vs.release()
 cv2.destroyAllWindows()
