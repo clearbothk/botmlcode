@@ -10,7 +10,7 @@ class Detector:
 	LABELS = None
 	ln = None
 
-	def __init__(self, model_path, use_gpu=False, confidence_thres=0.5, nms_thres=0.3, weights_file="clearbot.weights",
+	def __init__(self, model_path, use_gpu=False, confidence_thres=0.5, nms_thres=0.3, weights_file="clearbot_26_06_20.weights",
 	             config_file="clearbot.cfg", names_file="clearbot.names"):
 		"""
 		Initialise a instance for YOLOv4 object detection.

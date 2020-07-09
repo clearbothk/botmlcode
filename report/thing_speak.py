@@ -28,7 +28,7 @@ class Thing_speak:
         gps_location = re.findall(r"[-+]?\d*\.\d+|\d+", location_string)
         
         label_data = str(self.label.get_label())
-        confidence_data = str(self.confidence.get_confidence())
+        confidence_data = str(self.confidence.get_confidence()*100)
         lat = gps_location[0]
         lon = gps_location[1]
         battery_status_data = str(self.battery_status.get_battery())
