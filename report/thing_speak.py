@@ -1,12 +1,13 @@
+import os
 import paho.mqtt.publish as publish
 from report.clearbot_attributes import *
 import time
 import re
 
-channelID = "1092630"
-apiKey = "FGN0JQQLW5D88TJ1"
+CHANNEL_ID = os.environ.get("CHANNEL_ID")
+API_KEY = os.environ.get("API_KEY")
 
-topic = "channels/"+ channelID +"/publish/"+ apiKey
+topic = "channels/"+ CHANNEL_ID +"/publish/"+ API_KEY
 mqttHost = "mqtt.thingspeak.com"
 tTransport = "tcp"
 tPort = 1883
