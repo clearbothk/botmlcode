@@ -1,10 +1,11 @@
 import time
 import argparse
 import logging
-import asyncio
+import multiprocessing
 from serial import serialutil
 from imutils.video import FPS
 import cv2
+from queue import Queue
 
 from detector import yolo
 from report import report
@@ -12,34 +13,42 @@ from report import reports
 from report import pixhawk
 from report import thing_speak
 
-async def writeData(pixhawk, thing_speak, report):
-	try:
-		pixhawk_init = pixhawk.Pixhawk()
-		pixhawk_data = pixhawk_init.get_data()
-		logging.debug(pixhawk_data)
+report_path = 'report/report_folder/report.json'
+reports_path = 'report/report_folder/reports.json'
+q = Queue(maxsize=0)
 
-		# post to thingspeak.com
-		visualize = thing_speak.Thing_speak(r, pixhawk_data)
-		visualize.show_thingspeak()
+def writeData():
+	while True:
+		while True:
+			if (q.empty == False):
+				break
 
-		# saved to reports.json
-		get_report = report.Report(r, pixhawk_data)
-		get_report.create_report()
-		get_report.print_report()
-		get_report.write_report(report_path)
-		reports.combine(reports_path)
-		return 0
-		
-	except serialutil.SerialException as e:
-		# @utkarsh867: 9th July, 2020
-		# I added this exception handler so that the code does not crash when it does not find a serial connection
-		# to the Pixhawk
-		logging.error(e)
-		return -1
+		try:
+			yolo_data = q.get()
+			pixhawk_init = pixhawk.Pixhawk()
+			pixhawk_data = pixhawk_init.get_data()
+			logging.debug(pixhawk_data)
 
-async def main(args):
-	report_path = 'report/report_folder/report.json'
-	reports_path = 'report/report_folder/reports.json'
+			# post to thingspeak.com
+			visualize = thing_speak.Thing_speak(yolo_data, pixhawk_data)
+			visualize.show_thingspeak()
+
+			# saved to reports.json
+			get_report = report.Report(yolo_data, pixhawk_data)
+			get_report.create_report()
+			get_report.print_report()
+			get_report.write_report(report_path)
+			reports.combine(reports_path)
+			return 0
+			
+		except serialutil.SerialException as e:
+			# @utkarsh867: 9th July, 2020
+			# I added this exception handler so that the code does not crash when it does not find a serial connection
+			# to the Pixhawk
+			logging.error(e)
+			return -1
+
+def main(args):
 
 	logging.info("accessing video stream...")
 	vs = cv2.VideoCapture(0)
@@ -63,14 +72,9 @@ async def main(args):
 		logging.debug(result)
 
 		for r in result:
+			q.put(r)
 			# This loop is iterating over all YOLO results
 			# TODO: Optimise this section so that each frame is sent only once.
-			task1 = asyncio.create_task(
-				writeData(pixhawk, thing_speak, report)
-			)
-
-			val = await task1
-			print(val)
 
 		if args.video_out:
 			cv2.imshow("Clearbot", frame)
@@ -97,4 +101,13 @@ if __name__ == "__main__":
 	else:
 		logging.getLogger().setLevel(logging.INFO)
 
-	asyncio.run(main(args))
+	# Set multiprocessing
+	p1 = multiprocessing.Process(target=main)
+	p2 = multiprocessing.Process(target=writeData)
+
+	# Start Multiprocessing
+	p1.start()
+	p2.start()
+
+	p1.join()
+	p2.join()
