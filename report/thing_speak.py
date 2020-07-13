@@ -5,10 +5,8 @@ import time
 import re
 import config
 
-CHANNEL_ID = os.environ.get("CHANNEL_ID")
-API_KEY = os.environ.get("API_KEY")
 
-topic = "channels/"+ CHANNEL_ID +"/publish/"+ API_KEY
+topic = "channels/"+ config.CHANNEL_ID +"/publish/"+ config.API_KEY
 mqttHost = "mqtt.thingspeak.com"
 tTransport = "tcp"
 tPort = 1883
