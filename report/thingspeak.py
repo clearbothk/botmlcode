@@ -1,30 +1,28 @@
+import os
 import paho.mqtt.publish as publish
-from report.clearbot_attributes import *
-import time
+from report.attributes import Label, Confidence, Location, BatteryStatus, SystemStatus
 import re
 
-channelID = "1092630"
-apiKey = "FGN0JQQLW5D88TJ1"
 
-topic = "channels/"+ channelID +"/publish/"+ apiKey
+# topic = "channels/"+ config.CHANNEL_ID +"/publish/"+ config.API_KEY
+topic = "channels/publish"
 mqttHost = "mqtt.thingspeak.com"
 tTransport = "tcp"
 tPort = 1883
 tTLS = None
 
 
-class Thing_speak:
+class ThingSpeak:
+    def __init__(self, yolo, pixhawk):
+        self.label = Label(yolo)
+        self.confidence = Confidence(yolo)
+        self.location = Location(pixhawk)
+        self.battery_status = BatteryStatus(pixhawk)
+        self.system_status = SystemStatus(pixhawk)
 
-    def __init__(self,yolo, pixhawk):
-        self.label = Label.Label(yolo)
-        self.confidence = Confidence.Confidence(yolo)
-        self.location = Location.Location(pixhawk)
-        self.battery_status = Battery_status.Battery_status(pixhawk)
-        self.system_status = System_status.System_status(pixhawk)
-        
     def show_thingspeak(self):
         #get gps_location from string variable and stored it in a list
-        location_string = self.location.get_coordinate()
+        location_string = self.location.get_coordinates()
         gps_location = re.findall(r"[-+]?\d*\.\d+|\d+", location_string)
         
         label_data = str(self.label.get_label())
