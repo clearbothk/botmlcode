@@ -11,7 +11,7 @@ reports_path = 'report_folder/reports.json'
 
 print("[INFO] accessing video stream...")
 vs = cv2.VideoCapture(0)
-detector = yolo.Detector("model", use_gpu=True, weights_file="clearbot_26_06_20.weights")
+detector = yolo.Detector("model", use_gpu=True, weights_file="clearbot.weights")
 
 reports = Reports()
 previous = 0
