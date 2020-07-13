@@ -18,6 +18,7 @@ reports_path = 'report/report_folder/reports.json'
 q = Queue(maxsize=0)
 
 def writeData():
+	print("THinkspeak is starting")
 	while True:
 		while True:
 			if (q.empty == False):
@@ -48,7 +49,9 @@ def writeData():
 			logging.error(e)
 			return -1
 
-def main(args):
+#def main(args):
+def main():
+	print("Yolo is starting")
 
 	logging.info("accessing video stream...")
 	vs = cv2.VideoCapture(0)
@@ -92,6 +95,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Clearbot AI and PController")
 	parser.add_argument('-v', '--video_out', type=bool, default=False, help="Show the camera video output")
 	parser.add_argument('--debug', type=bool, default=False, help="Switch to debug mode")
+	global args
 	args = parser.parse_args()
 
 	# Added the logging package instead of printing data randomly

@@ -3,7 +3,7 @@ import paho.mqtt.publish as publish
 from report.clearbot_attributes import *
 import time
 import re
-import config
+from report import config
 
 
 topic = "channels/"+ config.CHANNEL_ID +"/publish/"+ config.API_KEY
