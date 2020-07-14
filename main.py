@@ -1,4 +1,3 @@
-import time
 import argparse
 import logging
 import multiprocessing
@@ -8,10 +7,9 @@ import cv2
 from queue import Queue
 
 from detector import detector as dt
-from report import report
+from report import report, thingspeak
 from report import reports
-from report import pixhawk
-from report import thingspeak
+from pixhawk import pixhawk
 
 report_path = 'report/report_folder/report.json'
 reports_path = 'report/report_folder/reports.json'
@@ -27,13 +25,11 @@ def writeData():
 
 		try:
 			yolo_data = q.get()
-			pixhawk_init = pixhawk.Pixhawk()
-			pixhawk_data = pixhawk_init.get_data()
-			logging.debug(pixhawk_data)
+			pixhawk_instance = pixhawk.Pixhawk()
+			logging.debug("Created a pixhawk instance")
 
 			# post to thingspeak.com
-			logging.debug(f"Sending data to ThingSpeak:\n{yolo_data}\n{pixhawk_data}")
-			visualize = thingspeak.ThingSpeak(yolo_data, pixhawk_data)
+			visualize = thingspeak.ThingSpeak(yolo_data, pixhawk_instance)
 			visualize.show_thingspeak()
 
 			# saved to reports.json

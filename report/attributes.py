@@ -24,7 +24,7 @@ class BatteryStatus:
 
 class CheckVehicleArmed:
 	def __init__(self, y):
-		self.y = y[18]
+		self.y =
 
 	def get_armed_status(self):
 		return self.y

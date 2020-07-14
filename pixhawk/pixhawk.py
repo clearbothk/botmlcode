@@ -72,52 +72,6 @@ class Pixhawk:
 	def check_vehicle_armed(self):
 		return self.vehicle.armed
 
-	def get_data(self):
-		# self.result.append
-		# 	"firmware_version" : self.vehicle.version,
-		# 	"vehicle_capabilities" : self.vehicle.capabilities.ftp,
-		# 	"location" :self.vehicle.location.global_frame,
-		#     "altitude" : self.vehicle.attitude,
-		#     "velocity" : self.vehicle.velocity,
-		#     "gps" : self.vehicle.gps_0,
-		#     "ground_speed" : self.vehicle.groundspeed,
-		#     "air_speed" : self.vehicle.airspeed,
-		#     "gimbal_status" : self.vehicle.gimbal,
-		#     "battery_status" : self.vehicle.battery,
-		#     "EKF_OK" : self.vehicle.ekf_ok,
-		#     "last_heartbeat" : self.vehicle.last_heartbeat,
-		#     "range_finder_distance" : self.vehicle.rangefinder.distance,
-		#     "range_finder_voltage" : self.vehicle.rangefinder.voltage,
-		#     "heading" : self.vehicle.heading,
-		#     "vehicle_is_armable" : self.vehicle.is_armable,
-		#     "system_status" : self.vehicle.system_status.state,
-		#     "vehicle_mode_name" : self.vehicle.mode.name,
-		#     "check_vehicle_armed" : self.vehicle.armed
-		# })
-		self.result = [
-			str(self.vehicle.version),
-			str(self.vehicle.capabilities.ftp),
-			str(self.vehicle.location.global_frame),
-			str(self.vehicle.attitude),
-			str(self.vehicle.velocity),
-			str(self.vehicle.gps_0),
-			self.vehicle.groundspeed,
-			self.vehicle.airspeed,
-			str(self.vehicle.gimbal),
-			str(self.vehicle.battery),
-			self.vehicle.ekf_ok,
-			self.vehicle.last_heartbeat,
-			str(self.vehicle.rangefinder.distance),
-			str(self.vehicle.rangefinder.voltage),
-			self.vehicle.heading,
-			self.vehicle.is_armable,
-			self.vehicle.system_status.state,
-			self.vehicle.mode.name,
-			self.vehicle.armed
-		]
-		# self.result = result
-		return self.result
-
 	def debug(self):
 		print('Autopilot Firmware version: %s' % self.vehicle.version)
 		print('Autopilot capabilities (supports ftp): %s' % self.vehicle.capabilities.ftp)
