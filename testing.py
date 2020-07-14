@@ -1,13 +1,13 @@
 from dronekit import connect, VehicleMode, LocationGlobalRelative
-
+print("stage 1 done")
 
 connection_port="/dev/ttyTHS1"
 
 baud=57600
-vehicle = connect(connection_port, wait_ready=True, baud=baud)
+vehicle = connect(connection_port, wait_ready=False, baud=baud)
 vehicle.mode = VehicleMode("MANUAL")
 
-
+print("stage 2 done")
 # print('Autopilot Firmware version: %s' % vehicle.version)
 # print('Autopilot capabilities (supports ftp): %s' % vehicle.capabilities.ftp)
 print('Global Location: %s' % vehicle.location.global_frame)

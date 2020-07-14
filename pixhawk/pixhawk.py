@@ -5,7 +5,7 @@ class Pixhawk:
 	vehicle = None
 
 	def __init__(self, connection_port="/dev/ttyTHS1", baud=57600):
-		self.vehicle = connect(connection_port, wait_ready=True, baud=baud)
+		self.vehicle = connect(connection_port, wait_ready=False, baud=baud)
 		self.vehicle.mode = VehicleMode("MANUAL")
 		self.result = []
 
