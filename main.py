@@ -4,14 +4,12 @@ import multiprocessing
 from serial import serialutil
 from imutils.video import FPS
 import cv2
-from queue import Queue
+from multiprocessing import Queue
 
 from detector import detector as dt
 from report import report, thingspeak
-from report import reports
 from pixhawk import pixhawk
 
-report_path = 'report/report_folder/report.json'
 reports_path = 'report/report_folder/reports.json'
 q = Queue(maxsize=0)
 
@@ -30,14 +28,14 @@ def writeData():
 
 			# post to thingspeak.com
 			visualize = thingspeak.ThingSpeak(yolo_data, pixhawk_instance)
-			visualize.show_thingspeak()
+			visualize.send_to_thingspeak()
 
 			# saved to reports.json
-			get_report = report.Report(yolo_data, pixhawk_data)
+			get_report = report.Report(yolo_data, pixhawk)
 			get_report.create_report()
 			get_report.print_report()
-			get_report.write_report(report_path)
-			reports.combine(reports_path)
+			get_report.write_report(reports_path)
+			# We put it to indicate no error
 			return 0
 
 		except serialutil.SerialException as e:

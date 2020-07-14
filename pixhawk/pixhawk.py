@@ -21,8 +21,8 @@ class Pixhawk:
 	def do_capture_relative_global_location(self):
 		return self.vehicle.location.global_relative_frame
 
-	def do_capture_altitude(self):
-		return self.vehicle.altitude
+	def do_capture_attitude(self):
+		return self.vehicle.attitude
 
 	def do_capture_velocity(self):
 		return self.vehicle.velocity
