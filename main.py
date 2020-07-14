@@ -1,10 +1,11 @@
 import argparse
 import logging
 import multiprocessing
-from serial import serialutil
-from imutils.video import FPS
-import cv2
 from multiprocessing import Queue
+from serial import serialutil
+
+import cv2
+from imutils.video import FPS
 
 from detector import detector as dt
 from report import report, thingspeak
@@ -31,7 +32,7 @@ def writeData():
 			visualize.send_to_thingspeak()
 
 			# saved to reports.json
-			get_report = report.Report(yolo_data, pixhawk)
+			get_report = report.Report(yolo_data, pixhawk_instance)
 			get_report.create_report()
 			get_report.print_report()
 			get_report.write_report(reports_path)
