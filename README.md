@@ -72,4 +72,29 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
 ```
 
 
-### Setup on the Jetson Nano board for Pixhawk
+#### Setup on the Jetson Nano board for Pixhawk
+
+we are using [DroneKit-Python API](https://dronekit-python.readthedocs.io/en/latest/about/overview.html) as an Onboard app between Jetson Nano and Pixhawk. 
+
+Make sure your linux userid has the permission to use your tty port device
+
+connection port = `dev/ttyTHS1`
+
+Assume our userid is `user`
+```bash
+sudo usermod -a -G dialout user
+```
+
+In `pixhawk.py` script, this is the line code to establish Dronekit connectivity to the connected device. We must set [wait_ready=True](https://dronekit-python.readthedocs.io/en/latest/guide/connecting_vehicle.html) to waits until some vehicle parameters and attributes are populated.
+
+```python
+def __init__(self, connection_port="/dev/ttyTHS1", baud=57600):
+		try:
+			self.vehicle = connect(connection_port, wait_ready=True, baud=baud)
+			self.vehicle.mode = VehicleMode("MANUAL")
+		except serialutil.SerialException as e:
+			logging.error(e)
+````
+
+
+You can check the Dronekit attributes listed [here](https://dronekit-python.readthedocs.io/en/latest/guide/vehicle_state_and_parameters.html)
