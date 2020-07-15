@@ -2,7 +2,6 @@ import argparse
 import logging
 import multiprocessing
 from multiprocessing import Queue
-from serial import serialutil
 
 import cv2
 from imutils.video import FPS
@@ -16,35 +15,30 @@ q = Queue(maxsize=0)
 
 
 def writeData():
+	logging.info("Starting connection to Pixhawk")
+	try:
+		pixhawk_instance = pixhawk.Pixhawk()
+		logging.info("Connected to Pixhawk")
+	except Exception as e:
+		return -1
+
 	while True:
 		while True:
 			if (q.empty == False):
 				logging.debug("Message queue is empty")
 				break
 
-		try:
-			yolo_data = q.get()
-			pixhawk_instance = pixhawk.Pixhawk()
-			logging.debug("Created a pixhawk instance")
+		yolo_data = q.get()
 
-			# post to thingspeak.com
-			visualize = thingspeak.ThingSpeak(yolo_data, pixhawk_instance)
-			visualize.send_to_thingspeak()
+		# post to thingspeak.com
+		visualize = thingspeak.ThingSpeak(yolo_data, pixhawk_instance)
+		visualize.send_to_thingspeak()
 
-			# saved to reports.json
-			get_report = report.Report(yolo_data, pixhawk_instance)
-			get_report.create_report()
-			get_report.print_report()
-			get_report.write_report(reports_path)
-			# We put it to indicate no error
-			return 0
-
-		except serialutil.SerialException as e:
-			# @utkarsh867: 9th July, 2020
-			# I added this exception handler so that the code does not crash when it does not find a serial connection
-			# to the Pixhawk
-			logging.error(e)
-			return -1
+		# saved to reports.json
+		get_report = report.Report(yolo_data, pixhawk_instance)
+		get_report.create_report()
+		get_report.print_report()
+		get_report.write_report(reports_path)
 
 
 def main(params):

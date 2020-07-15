@@ -1,13 +1,17 @@
 from dronekit import connect, VehicleMode
+import logging
+from serial import serialutil
 
 
 class Pixhawk:
 	vehicle = None
 
 	def __init__(self, connection_port="/dev/ttyTHS1", baud=57600):
-		self.vehicle = connect(connection_port, wait_ready=False, baud=baud)
-		self.vehicle.mode = VehicleMode("MANUAL")
-		self.result = []
+		try:
+			self.vehicle = connect(connection_port, wait_ready=True, baud=baud)
+			self.vehicle.mode = VehicleMode("MANUAL")
+		except serialutil.SerialException as e:
+			logging.error(e)
 
 	def firmware_version(self):
 		return self.vehicle.version
