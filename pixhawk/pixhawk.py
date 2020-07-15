@@ -1,4 +1,4 @@
-from dronekit import connect, VehicleMode, LocationGlobalRelative
+from dronekit import connect, VehicleMode
 
 
 class Pixhawk:
