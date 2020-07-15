@@ -8,7 +8,7 @@ from imutils.video import FPS
 
 from detector import detector as dt
 from report import report, thingspeak
-from pixhawk import pixhawk
+from pixhawk import pixhawk as px
 
 reports_path = 'report/report_folder/reports.json'
 q = Queue(maxsize=0)
@@ -17,7 +17,7 @@ q = Queue(maxsize=0)
 def writeData():
 	logging.info("Starting connection to Pixhawk")
 	try:
-		pixhawk_instance = pixhawk.Pixhawk()
+		pixhawk = px.Pixhawk()
 		logging.info("Connected to Pixhawk")
 	except Exception as e:
 		return -1
@@ -31,11 +31,11 @@ def writeData():
 		yolo_data = q.get()
 
 		# post to thingspeak.com
-		visualize = thingspeak.ThingSpeak(yolo_data, pixhawk_instance)
+		visualize = thingspeak.ThingSpeak(yolo_data, pixhawk)
 		visualize.send_to_thingspeak()
 
 		# saved to reports.json
-		get_report = report.Report(yolo_data, pixhawk_instance)
+		get_report = report.Report(yolo_data, pixhawk)
 		get_report.create_report()
 		get_report.print_report()
 		get_report.write_report(reports_path)
@@ -46,7 +46,7 @@ def main(params):
 
 	logging.info("accessing video stream...")
 	vs = cv2.VideoCapture(0)
-	detector = dt.Detector("model", use_gpu=True)
+	detector = dt.Detector("model", use_gpu=True, weights_file="clearbot-tiny.weights", config_file="clearbot-tiny.cfg", confidence_thres=0.1)
 	fps = FPS().start()
 
 	while True:
