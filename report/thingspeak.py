@@ -3,8 +3,10 @@ import paho.mqtt.publish as publish
 import re
 import logging
 
-# topic = "channels/"+ config.CHANNEL_ID +"/publish/"+ config.API_KEY
-topic = "channels/publish"
+
+channel_ID = os.environ['CHANNEL_ID']
+api_key = os.environ['API_KEY']
+topic = "channels/"+channel_ID+"/publish/"+api_key
 mqttHost = "mqtt.thingspeak.com"
 tTransport = "tcp"
 tPort = 1883
