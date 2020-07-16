@@ -1,10 +1,8 @@
 import json
 
 
-class Report:
-	def __init__(self, yolo, pixhawk):
-		self.label = yolo["label"]
-		self.confidence = yolo["confidence"]
+class SystemReport:
+	def __init__(self, pixhawk):
 		self.firmware_version = pixhawk.firmware_version()
 		self.vehicle_capabilities = pixhawk.vehicle_capabilities()
 		self.location = pixhawk.do_capture_global_location()
@@ -28,8 +26,6 @@ class Report:
 
 	def create_report(self):
 		self.report = {
-			"label": self.label,
-			"confidence": self.confidence,
 			"firmware_version": self.firmware_version,
 			"vehicle_capabilities": self.vehicle_capabilities,
 			"location": self.location,
@@ -59,7 +55,7 @@ class Report:
 			data = json.load(f)
 			return data
 
-	def write_report(self, path):
+	def write_report(self, path='report/report_folder/reports.json'):
 		currentJSONDump = self.read_report_json(path)
 		currentJSONDump.append(self.report)
 		with open(path, 'w') as file_stream:
