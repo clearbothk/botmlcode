@@ -84,8 +84,15 @@ Assume our userid is `user`
 ```bash
 sudo usermod -a -G dialout user
 ```
+let's try running `testing.py` to get a brief introduction with `Dronekit` ( in `botmlcode/` directory )
 
-In `pixhawk.py` script, this is the line code to establish Dronekit connectivity to the connected device. We must set [wait_ready=True](https://dronekit-python.readthedocs.io/en/latest/guide/connecting_vehicle.html) to waits until some vehicle parameters and attributes are populated.
+```bash
+python testing.py
+```
+we are aware that we need to wait for around `10 seconds` or more to get the above's print statement be executed. At first, we though this was an issue( listed below )
+* Note ( 14th July, 2020): Optimise Pixhawk integration to the Jetson #5 [Track the issue here](https://github.com/clearbothk/botmlcode/issues/5)
+
+In `pixhawk.py` script, below is the line code to establish Dronekit connectivity to the connected device. it is recommended to set [wait_ready=True](https://dronekit-python.readthedocs.io/en/latest/guide/connecting_vehicle.html) to waits until some vehicle parameters and attributes are populated so that it is initialized successfully.
 
 ```python
 def __init__(self, connection_port="/dev/ttyTHS1", baud=57600):
@@ -95,6 +102,8 @@ def __init__(self, connection_port="/dev/ttyTHS1", baud=57600):
 		except serialutil.SerialException as e:
 			logging.error(e)
 ````
+Thus we need to first initialize the `dronekit.connect()` and make it as a constructor  rather than repeatedly run the scripts so that we do not need to re run the script for everytime the [Dronekit attributes functions](https://dronekit-python.readthedocs.io/en/latest/guide/vehicle_state_and_parameters.html)
+ get called.
 
 
-You can check the Dronekit attributes listed [here](https://dronekit-python.readthedocs.io/en/latest/guide/vehicle_state_and_parameters.html)
+
