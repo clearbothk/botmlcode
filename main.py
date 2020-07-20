@@ -1,52 +1,48 @@
 import argparse
 import logging
 import multiprocessing
-from multiprocessing import Queue
-
 import cv2
 from imutils.video import FPS
-
 from detector import detector as dt
-from report import report, thingspeak
+from report import report
+from thingspeak import thingspeak
 from pixhawk import pixhawk as px
 
-reports_path = 'report/report_folder/reports.json'
-q = Queue(maxsize=0)
 
-
-def writeData():
+def pixhawk_controller():
 	logging.info("Starting connection to Pixhawk")
 	try:
 		pixhawk = px.Pixhawk()
+		visualize = thingspeak.ThingSpeak(pixhawk)
 		logging.info("Connected to Pixhawk")
 	except Exception as e:
+		logging.error(e)
 		return -1
 
 	while True:
-		while True:
-			if (q.empty == False):
-				logging.debug("Message queue is empty")
-				break
+		system_report = report.SystemReport(pixhawk)
+		system_report.create_report()
+		system_report.print_report()
+		system_report.write_report()
 
-		yolo_data = q.get()
-
-		# post to thingspeak.com
-		visualize = thingspeak.ThingSpeak(yolo_data, pixhawk)
 		visualize.send_to_thingspeak()
 
-		# saved to reports.json
-		get_report = report.Report(yolo_data, pixhawk)
-		get_report.create_report()
-		get_report.print_report()
-		get_report.write_report(reports_path)
 
-
-def main(params):
-	print("Yolo is starting")
-
-	logging.info("accessing video stream...")
+def object_detection(params):
+	logging.info("Accessing video stream...")
 	vs = cv2.VideoCapture(0)
-	detector = dt.Detector("model", use_gpu=True, weights_file="clearbot-tiny.weights", config_file="clearbot-tiny.cfg", confidence_thres=0.1)
+
+	model_file = ""
+	cfg_file = ""
+	if args.model == "tiny":
+		model_file = "clearbot-tiny.weights"
+		cfg_file = "clearbot-tiny.cfg"
+	elif args.model == "full":
+		model_file = "clearbot.weights"
+		cfg_file = "clearbot.cfg"
+
+	detector = dt.Detector("model", use_gpu=True, weights_file=model_file, config_file=cfg_file,
+	                       confidence_thres=0.5)
 	fps = FPS().start()
 
 	while True:
@@ -56,29 +52,35 @@ def main(params):
 		result = detector.detect(frame)
 		for box in result:
 			bbox = box["bbox"]
+			label = box["label"]
 			x = bbox["x"]
 			y = bbox["y"]
 			w = bbox["width"]
 			h = bbox["height"]
-			cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+			cv2.rectangle(img=frame,
+			              pt1=(x, y),
+			              pt2=(x + w, y + h),
+			              color=(36, 255, 12),
+			              thickness=2)
+			cv2.putText(img=frame,
+			            text=label,
+			            org=(x, y - 10),
+			            fontFace=cv2.FONT_HERSHEY_COMPLEX,
+			            fontScale=0.7,
+			            color=(36, 255, 12),
+			            thickness=2)
 
 		logging.debug(result)
 
-		for r in result:
-			q.put(r)
-		# This loop is iterating over all YOLO results
-		# TODO: Optimise this section so that each frame is sent only once.
-
 		if params.video_out:
 			cv2.imshow("Clearbot", frame)
-			# If this is not there, frame will not actually show: I did not dig into the explanation
 			if cv2.waitKey(1) & 0xFF == ord('q'):
 				break
 
 		fps.update()
 
 	fps.stop()
-	logging.info("approx. FPS: {:.2f}".format(fps.fps()))
+	logging.debug("approx. FPS: {:.2f}".format(fps.fps()))
 	vs.release()
 	cv2.destroyAllWindows()
 
@@ -87,19 +89,17 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Clearbot AI and PController")
 	parser.add_argument('-v', '--video_out', type=bool, default=False, help="Show the camera video output")
 	parser.add_argument('--debug', type=bool, default=False, help="Switch to debug mode")
+	parser.add_argument('-m', '--model', type=str, default="tiny", help="Either tiny or full")
 	args = parser.parse_args()
 
-	# Added the logging package instead of printing data randomly
 	if args.debug:
 		logging.getLogger('root').setLevel(logging.DEBUG)
 	else:
 		logging.getLogger('root').setLevel(logging.INFO)
 
-	# Set multiprocessing
-	p1 = multiprocessing.Process(target=main, args=(args,))
-	p2 = multiprocessing.Process(target=writeData)
+	p1 = multiprocessing.Process(target=object_detection, args=(args,))
+	p2 = multiprocessing.Process(target=pixhawk_controller)
 
-	# Start Multiprocessing
 	p1.start()
 	p2.start()
 
