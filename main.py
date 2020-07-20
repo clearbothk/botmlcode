@@ -31,7 +31,18 @@ def pixhawk_controller():
 def object_detection(params):
 	logging.info("Accessing video stream...")
 	vs = cv2.VideoCapture(0)
-	detector = dt.Detector("model", use_gpu=True, weights_file="clearbot-tiny.weights", config_file="clearbot-tiny.cfg", confidence_thres=0.1)
+
+	model_file = ""
+	cfg_file = ""
+	if args.model == "tiny":
+		model_file = "clearbot-tiny.weights"
+		cfg_file = "clearbot-tiny.cfg"
+	elif args.model == "full":
+		model_file = "clearbot.weights"
+		cfg_file = "clearbot.cfg"
+
+	detector = dt.Detector("model", use_gpu=True, weights_file=model_file, config_file=cfg_file,
+	                       confidence_thres=0.5)
 	fps = FPS().start()
 
 	while True:
@@ -41,11 +52,23 @@ def object_detection(params):
 		result = detector.detect(frame)
 		for box in result:
 			bbox = box["bbox"]
+			label = box["label"]
 			x = bbox["x"]
 			y = bbox["y"]
 			w = bbox["width"]
 			h = bbox["height"]
-			cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 0, 0), 2)
+			cv2.rectangle(img=frame,
+			              pt1=(x, y),
+			              pt2=(x + w, y + h),
+			              color=(36, 255, 12),
+			              thickness=2)
+			cv2.putText(img=frame,
+			            text=label,
+			            org=(x, y - 10),
+			            fontFace=cv2.FONT_HERSHEY_COMPLEX,
+			            fontScale=0.7,
+			            color=(36, 255, 12),
+			            thickness=2)
 
 		logging.debug(result)
 
@@ -66,6 +89,7 @@ if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description="Clearbot AI and PController")
 	parser.add_argument('-v', '--video_out', type=bool, default=False, help="Show the camera video output")
 	parser.add_argument('--debug', type=bool, default=False, help="Switch to debug mode")
+	parser.add_argument('-m', '--model', type=str, default="tiny", help="Either tiny or full")
 	args = parser.parse_args()
 
 	if args.debug:
