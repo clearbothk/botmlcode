@@ -42,6 +42,14 @@ class Detector:
 		except Exception as e:
 			logging.error(e)
 
+		try:
+			logging.debug("Loading Camera parameter")
+			with np.load('camera_parameter/parameter.npz') as X:
+    			mtx, dist, rvecs, tvecs = [X[i] for i in ('mtx','dist','rvecs','tvecs')]
+			logging.debug("Finished loading Camera parameter")
+		except Exception as e:
+			logging.error(e)
+
 		if use_gpu:
 			logging.info("Will try to use GPU backend")
 			self.net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
@@ -115,6 +123,14 @@ class Detector:
 				"height": h
 			}
 		}
+	
+	def get_angle():
+		# Undistort image
+		h,w = img.shape[:2]
+		newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
+		dst = cv2.undistort(img, mtx, None, newcameramtx)
+		x, y, w ,h = roi
+		dst = dst[y:y+h, x:x+h]
 
 
 if __name__ == "__main__":

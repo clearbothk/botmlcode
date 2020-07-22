@@ -34,13 +34,14 @@ def object_detection(params):
 
 	model_file = ""
 	cfg_file = ""
-	if args.model == "tiny":
-		model_file = "clearbot-tiny.weights"
-		cfg_file = "clearbot-tiny.cfg"
-	elif args.model == "full":
-		model_file = "clearbot.weights"
-		cfg_file = "clearbot.cfg"
-
+	# if args.model == "tiny":
+	# 	model_file = "clearbot-tiny.weights"
+	# 	cfg_file = "clearbot-tiny.cfg"
+	# elif args.model == "full":
+	# 	model_file = "clearbot.weights"
+	# 	cfg_file = "clearbot.cfg"
+	model_file = "clearbot-tiny.weights"
+	cfg_file = "clearbot-tiny.cfg"
 	detector = dt.Detector("model", use_gpu=True, weights_file=model_file, config_file=cfg_file,
 	                       confidence_thres=0.5)
 	fps = FPS().start()
