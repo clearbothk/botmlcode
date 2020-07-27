@@ -5,7 +5,6 @@ import functools, operator
 
 import logging
 
-
 class Detector:
 	weights_file = None
 	config_file = None
@@ -44,8 +43,13 @@ class Detector:
 
 		try:
 			logging.debug("Loading Camera parameter")
-			with np.load('camera_parameter/parameter.npz') as X:
-    			mtx, dist, rvecs, tvecs = [X[i] for i in ('mtx','dist','rvecs','tvecs')]
+			mtx, dist, rvecs, tvecs = (
+    			np.load("camera_matrix.npy"),
+   				np.load("distortion_coeff.npy"),
+    			np.load("rvecs.npy"),
+    			np.load("tvecs.npy"),
+			)
+			angleToWidth = np.degrees(np.math.atan2(13, 17))
 			logging.debug("Finished loading Camera parameter")
 		except Exception as e:
 			logging.error(e)
@@ -124,13 +128,25 @@ class Detector:
 			}
 		}
 	
-	def get_angle():
-		# Undistort image
+	def get_angle(self):
 		h,w = img.shape[:2]
 		newcameramtx, roi = cv2.getOptimalNewCameraMatrix(mtx, dist, (w,h), 1, (w,h))
 		dst = cv2.undistort(img, mtx, None, newcameramtx)
 		x, y, w ,h = roi
 		dst = dst[y:y+h, x:x+h]
+		dst = dst[y : y + h, x : x + w]
+    	centerX, centerY = int(w / 2), int(h / 2)
+    	print(centerX, centerY)
+    	dst = cv.line(dst, (0, centerY), (w, centerY), (255, 0, 0), 2)
+    	dst = cv.circle(dst, (centerX, centerY), 1, (0, 255, 0), 1)
+    	angleToWidthRatio = (w / 2) / angleToWidth
+    	for i in range(5, int(angleToWidth), 5):
+        	dst = cv.circle(
+           		dst, (int(centerX - angleToWidthRatio * i), centerY), 1, (0, 0, 255), 2
+        	)
+        	dst = cv.circle(
+            	dst, (int(centerX + angleToWidthRatio * i), centerY), 1, (0, 0, 255), 2
+        	)
 
 
 if __name__ == "__main__":

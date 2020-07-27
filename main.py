@@ -34,14 +34,13 @@ def object_detection(params):
 
 	model_file = ""
 	cfg_file = ""
-	# if args.model == "tiny":
-	# 	model_file = "clearbot-tiny.weights"
-	# 	cfg_file = "clearbot-tiny.cfg"
-	# elif args.model == "full":
-	# 	model_file = "clearbot.weights"
-	# 	cfg_file = "clearbot.cfg"
-	model_file = "clearbot-tiny.weights"
-	cfg_file = "clearbot-tiny.cfg"
+	if args.model == "tiny":
+		model_file = "clearbot-tiny.weights"
+		cfg_file = "clearbot-tiny.cfg"
+	elif args.model == "full":
+		model_file = "clearbot.weights"
+		cfg_file = "clearbot.cfg"
+
 	detector = dt.Detector("model", use_gpu=True, weights_file=model_file, config_file=cfg_file,
 	                       confidence_thres=0.5)
 	fps = FPS().start()
@@ -51,6 +50,16 @@ def object_detection(params):
 		if not grabbed:
 			break
 		result = detector.detect(frame)
+
+		# If there is more than One object, find the nearest one and get the angle
+		"""
+		Detect the objects in the frame
+		TO DO List:
+		1. Find the coordinate of each object to the center point of the camera
+		2. Find the nearest one using Euclidean distance
+		"""
+		angle = detector.get_angle()
+
 		for box in result:
 			bbox = box["bbox"]
 			label = box["label"]
