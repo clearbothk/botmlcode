@@ -156,6 +156,7 @@ class Detector:
 		real_distance = 0
 		angle = 0
 		if (x_axis < 316):
+			x_axis = 316 - x_axis
 			real_distance = (14.5 * x_axis)/316
 			angle = np.degrees(np.math.atan2(real_distance, 45))
 		
@@ -167,6 +168,7 @@ class Detector:
 		else:
 			angle = 0
 		return angle
+
 if __name__ == "__main__":
 	logging.getLogger().setLevel(logging.DEBUG)
 

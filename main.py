@@ -73,7 +73,7 @@ def object_detection(params):
 			              color=(36, 255, 12),
 			              thickness=2)
 			x_axis = x+(w/2)
-			angle = detector.get_angle(x_axis
+			angle = detector.get_angle(x_axis)
 			print(angle)
 			cv2.putText(img=frame,
 			            text=label,
