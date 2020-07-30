@@ -54,7 +54,7 @@ class Detector:
     			np.load(self.rvecs_file),
     			np.load(self.tvecs_file),
 			)
-			self.angleToWidth = np.degrees(np.math.atan2(13, 17))
+			self.angleToWidth = np.degrees(np.math.atan2(14.5, 45))
 			logging.debug("Finished loading Camera parameter")
 		except Exception as e:
 			logging.error(e)
@@ -133,15 +133,13 @@ class Detector:
 			}
 		}
 	
-	def get_angle(self, frame):
+	def get_calibrated_line(self, frame):
 		h,w = frame.shape[:2]
 		newcameramtx, roi = cv2.getOptimalNewCameraMatrix(self.mtx, self.dist, (w,h), 1, (w,h))
-		dst = cv2.undistort(frame, self.mtx, None, newcameramtx)
+		dst = cv2.undistort(frame, self.mtx, self.dist,None, newcameramtx)
 		x, y, w ,h = roi
-		dst = dst[y:y+h, x:x+h]
 		dst = dst[y : y + h, x : x + w]
 		centerX, centerY = int(w / 2), int(h / 2)
-		#print(centerX, centerY)
 		dst = cv2.line(dst, (0, centerY), (w, centerY), (255, 0, 0), 2)
 		dst = cv2.circle(dst, (centerX, centerY), 1, (0, 255, 0), 1)
 		angleToWidthRatio = (w / 2) / self.angleToWidth
@@ -153,7 +151,22 @@ class Detector:
 				dst, (int(centerX + angleToWidthRatio * i), centerY), 1, (0, 0, 255), 2
 			)
 		return dst
+	
+	def get_angle(self, x_axis):
+		real_distance = 0
+		angle = 0
+		if (x_axis < 316):
+			real_distance = (14.5 * x_axis)/316
+			angle = np.degrees(np.math.atan2(real_distance, 45))
+		
+		elif (x_axis > 316):
+			x_axis = x_axis - 316
+			real_distance = (14.5 * x_axis)/316
+			angle = np.degrees(np.math.atan2(real_distance, 45))
 
+		else:
+			angle = 0
+		return angle
 if __name__ == "__main__":
 	logging.getLogger().setLevel(logging.DEBUG)
 

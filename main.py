@@ -57,8 +57,9 @@ def object_detection(params):
 		1. Find the coordinate of each object to the center point of the camera
 		2. Find the nearest one using Euclidean distance
 		"""
-		angle = detector.get_angle(frame)
-		#print(angle)
+		frame = detector.get_calibrated_line(frame)
+		# cv2.namedWindow('dst', cv2.WINDOW_NORMAL)
+		# cv2.imshow('dst', dst)
 		for box in result:
 			bbox = box["bbox"]
 			label = box["label"]
@@ -71,6 +72,9 @@ def object_detection(params):
 			              pt2=(x + w, y + h),
 			              color=(36, 255, 12),
 			              thickness=2)
+			x_axis = x+(w/2)
+			angle = detector.get_angle(x_axis
+			print(angle)
 			cv2.putText(img=frame,
 			            text=label,
 			            org=(x, y - 10),
