@@ -50,16 +50,8 @@ def object_detection(params):
 			break
 		result = detector.detect(frame)
 
-		# If there is more than One object, find the nearest one and get the angle
-		"""
-		Detect the objects in the frame
-		TO DO List:
-		1. Find the coordinate of each object to the center point of the camera
-		2. Find the nearest one using Euclidean distance
-		"""
 		frame = detector.get_calibrated_line(frame)
-		# cv2.namedWindow('dst', cv2.WINDOW_NORMAL)
-		# cv2.imshow('dst', dst)
+
 		for box in result:
 			bbox = box["bbox"]
 			label = box["label"]
@@ -74,12 +66,19 @@ def object_detection(params):
 			              thickness=2)
 			x_axis = x+(w/2)
 			angle = detector.get_angle(x_axis)
-			print(angle)
 			cv2.putText(img=frame,
 			            text=label,
-			            org=(x, y - 10),
+			            org=(x, y - 30),
 			            fontFace=cv2.FONT_HERSHEY_COMPLEX,
 			            fontScale=0.7,
+			            color=(36, 255, 12),
+			            thickness=2)
+
+			cv2.putText(img=frame,
+			            text='angle: '+str(angle),
+			            org=(x, y - 10),
+			            fontFace=cv2.FONT_HERSHEY_COMPLEX,
+			            fontScale=0.4,
 			            color=(36, 255, 12),
 			            thickness=2)
 
