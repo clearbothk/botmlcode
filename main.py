@@ -40,7 +40,6 @@ def object_detection(params):
 	elif args.model == "full":
 		model_file = "clearbot.weights"
 		cfg_file = "clearbot.cfg"
-
 	detector = dt.Detector("model", use_gpu=True, weights_file=model_file, config_file=cfg_file,
 	                       confidence_thres=0.5)
 	fps = FPS().start()
@@ -50,6 +49,9 @@ def object_detection(params):
 		if not grabbed:
 			break
 		result = detector.detect(frame)
+
+		frame = detector.get_calibrated_line(frame)
+
 		for box in result:
 			bbox = box["bbox"]
 			label = box["label"]
@@ -62,11 +64,21 @@ def object_detection(params):
 			              pt2=(x + w, y + h),
 			              color=(36, 255, 12),
 			              thickness=2)
+			x_axis = x+(w/2)
+			angle = detector.get_angle(x_axis)
 			cv2.putText(img=frame,
 			            text=label,
-			            org=(x, y - 10),
+			            org=(x, y - 30),
 			            fontFace=cv2.FONT_HERSHEY_COMPLEX,
 			            fontScale=0.7,
+			            color=(36, 255, 12),
+			            thickness=2)
+
+			cv2.putText(img=frame,
+			            text='angle: '+str(angle),
+			            org=(x, y - 10),
+			            fontFace=cv2.FONT_HERSHEY_COMPLEX,
+			            fontScale=0.4,
 			            color=(36, 255, 12),
 			            thickness=2)
 

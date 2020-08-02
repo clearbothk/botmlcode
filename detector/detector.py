@@ -5,7 +5,6 @@ import functools, operator
 
 import logging
 
-
 class Detector:
 	weights_file = None
 	config_file = None
@@ -18,14 +17,19 @@ class Detector:
 	net = None
 	ln = None
 
-	def __init__(self, model_path="model", use_gpu=False, confidence_thres=0.5, nms_thres=0.3,
-	             weights_file="clearbot.weights", config_file="clearbot.cfg", names_file="clearbot.names"):
+	def __init__(self, model_path="model", parameter_path="camera_parameter", use_gpu=False, confidence_thres=0.5, nms_thres=0.3,
+	             weights_file="clearbot.weights", config_file="clearbot.cfg", matrix_file="camera_matrix.npy", distortion_file="distortion_coeff.npy",
+				 rvecs_file="rvecs.npy", tvecs_file="tvecs.npy", names_file="clearbot.names"):
 
 		self.confidence_threshold = confidence_thres
 		self.nms_threshold = nms_thres
 
 		self.weights_file = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), model_path, weights_file])
 		self.config_file = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), model_path, config_file])
+		self.matrix_file = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), parameter_path, matrix_file])
+		self.distortion_file = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), parameter_path, distortion_file])
+		self.rvecs_file = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), parameter_path, rvecs_file])
+		self.tvecs_file = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), parameter_path, tvecs_file])
 		self.names_file = os.path.sep.join([os.path.dirname(os.path.realpath(__file__)), model_path, names_file])
 		logging.debug("Finished initialising model file paths")
 
@@ -39,6 +43,19 @@ class Detector:
 			logging.debug("Loading Darknet model")
 			self.net = cv2.dnn.readNetFromDarknet(self.config_file, self.weights_file)
 			logging.debug("Finished loading Darknet model")
+		except Exception as e:
+			logging.error(e)
+
+		try:
+			logging.debug("Loading Camera parameter")
+			self.mtx, self.dist, self.rvecs, self.tvecs = (
+    			np.load(self.matrix_file),
+   				np.load(self.distortion_file),
+    			np.load(self.rvecs_file),
+    			np.load(self.tvecs_file),
+			)
+			self.angleToWidth = np.degrees(np.math.atan2(14.5, 45))
+			logging.debug("Finished loading Camera parameter")
 		except Exception as e:
 			logging.error(e)
 
@@ -115,7 +132,42 @@ class Detector:
 				"height": h
 			}
 		}
+	
+	def get_calibrated_line(self, frame):
+		h,w = frame.shape[:2]
+		newcameramtx, roi = cv2.getOptimalNewCameraMatrix(self.mtx, self.dist, (w,h), 1, (w,h))
+		dst = cv2.undistort(frame, self.mtx, self.dist,None, newcameramtx)
+		x, y, w ,h = roi
+		dst = dst[y : y + h, x : x + w]
+		centerX, centerY = int(w / 2), int(h / 2)
+		dst = cv2.line(dst, (0, centerY), (w, centerY), (255, 0, 0), 2)
+		dst = cv2.circle(dst, (centerX, centerY), 1, (0, 255, 0), 1)
+		angleToWidthRatio = (w / 2) / self.angleToWidth
+		for i in range(5, int(self.angleToWidth), 5):
+			dst = cv2.circle(
+				dst, (int(centerX - angleToWidthRatio * i), centerY), 1, (0, 0, 255), 2
+			)
+			dst = cv2.circle(
+				dst, (int(centerX + angleToWidthRatio * i), centerY), 1, (0, 0, 255), 2
+			)
+		return dst
+	
+	def get_angle(self, x_axis):
+		real_distance = 0
+		angle = 0
+		if (x_axis < 316):
+			x_axis = 316 - x_axis
+			real_distance = (14.5 * x_axis)/316
+			angle = np.degrees(np.math.atan2(real_distance, 45))
+		
+		elif (x_axis > 316):
+			x_axis = x_axis - 316
+			real_distance = (14.5 * x_axis)/316
+			angle = np.degrees(np.math.atan2(real_distance, 45))
 
+		else:
+			angle = 0
+		return angle
 
 if __name__ == "__main__":
 	logging.getLogger().setLevel(logging.DEBUG)
