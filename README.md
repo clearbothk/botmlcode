@@ -72,7 +72,8 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
 ```
 
 
-#### Setup on the Jetson Nano board for Pixhawk
+# Setup on the Jetson Nano board for Pixhawk
+
 
 we are using [DroneKit-Python API](https://dronekit-python.readthedocs.io/en/latest/about/overview.html) as an Onboard app between Jetson Nano and Pixhawk. 
 
@@ -105,5 +106,50 @@ def __init__(self, connection_port="/dev/ttyTHS1", baud=57600):
 Thus we need to first initialize the `dronekit.connect()` and make it as a constructor  rather than repeatedly run the scripts so that we do not need to re run the script for everytime the [Dronekit attributes functions](https://dronekit-python.readthedocs.io/en/latest/guide/vehicle_state_and_parameters.html)
  get called.
 
+ # Angle measurement 
+ 
+### Requirements
+
+- OpenCV (latest version from the repo: see setup instructions for details)
+- Python 3.6 or above
+- Numpy (latest version)
+
+Make sure the clearbot camera has already been calibrated. If you are using a different camera or you want to calibrate the camera again, [click here](https://opencv-python-tutroals.readthedocs.io/en/latest/py_tutorials/py_calib3d/py_calibration/py_calibration.html) for reference. Make sure to calculate the distance between the camera to the calibration checkboard and calculate the half of the value of horizontal length of the calibration checkboard. You can find the `Check_board.pdf` image inside `imgsrc/` directory. 
+
+
+![alt text](imgsrc/pinhole_camera_model.png?raw=true)
+
+Below is the `get_angle()` function. It is located in `detector.py`
+```python
+	def get_angle(self, x_axis):
+		real_distance = 0
+		angle = 0
+		if (x_axis < 316):
+			x_axis = 316 - x_axis
+			real_distance = (14.5 * x_axis)/316
+			angle = np.degrees(np.math.atan2(real_distance, 45))
+		
+		elif (x_axis > 316):
+			x_axis = x_axis - 316
+			real_distance = (14.5 * x_axis)/316
+			angle = np.degrees(np.math.atan2(real_distance, 45))
+
+		else:
+			angle = 0
+		return angle
+```
+- Let the distance between the camera to the calibration checkboard as X 
+
+- Let the half of the value its horizontal length of the calibration checkboard as Y
+
+In this current configuration, X = 45 and Y = 14.5. By using the inverse tangent function we can get the maximum angle that the camera gets. We can use [NumPy](https://numpy.org/doc/stable/reference/generated/numpy.degrees.html) library by using `np.degrees(np.math.atan2(real_distance, 45))`. real_distance depends on where the object at.
+
+ If the object's x_axis is located in the 2nd and 3rd quadrant, then the real_distance is:
+
+ `(Y * ((horizantal pixel length / 2) - x_axis)/ (horizantal pixel length / 2)`. 
+
+
+On the other hand, if the if the object's x_axis is located in the 1st and 4th quadrant, then the real_distance is:
+`(Y * (x_axis - (horizantal pixel length / 2)))/ (horizantal pixel length / 2)`.
 
 
