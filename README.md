@@ -1,58 +1,74 @@
-# Clearbot Jetson Nano Codebase
+# Documentation for setting up Jetson Nano
+ ## Some basic guidelines
+ - The commands below are quite specific. This means that the following things should be avoided
 
-### Requirements
+- **DO NOT** use **sudo** where not specified. If you are facing issues, re-evaluate your actions and its consequences. Make sure that you followed the steps.
+- Make sure that you are using virtual environment where specified. Virtual environment, while it seems insignificant, is actually mandatory.
 
-- OpenCV (latest version from the repo: see setup instructions for details)
-- Git and Git LFS (LFS is used for weights file)
-- Python 3.6 or above
+## 1. Clone the Botmlcode repo
+```bash
+git clone https://github.com/clearbothk/botmlcode.git
+```
+## 2. Install pip
 
-##### When cloning this repository, make sure that you have Git LFS to pull the weights file. Otherwise you will get an error on running the code.
+```bash
+curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+python get-pip.py
+```
 
-### How to setup and run this code?
+After installation is finished, restart the Jetson Nano
 
-Make sure that OpenCV has been compiled and installed.
-
-##### Note ( 19th June, 2020): OpenCV needs to be compiled because the YOLOv4 requires features that are scheduled in a future release. [Track the issue here](https://github.com/opencv/opencv/pull/17185)
-
-#### Creating a virtual environment for the project
-
-A python 3 virtual environment can be created as follows:
+## 3. Setup and activate the virtualenv
 
 ```bash
 pip install virtualenv --user
+cd ~/botmlcode
 virtualenv .venv -p python3
+```
+
+Then, to activate the virtual environment, run:
+
+```bash
+cd ~/botmlcode
 source .venv/bin/activate
 ```
 
-#### Installing OpenCV that has been built on the machine, to the virtual environment
-
-Make sure that you have compiled OpenCV using the command `make`. You DO NOT need to run `make install` for this to work.
-
-Also make sure that you installed a Python virtual environment for this project.
-
-Let us assume that the path to the `opencv/build` directory is `$OPENCV`
+## 4. Install numpy in virtualenv
 
 ```bash
-cd .venv/lib/python3.8/site-packages
-ln -s $OPENCV/lib/python3/cv2.cpython-38-darwin.so cv2.so
+pip install numpy
 ```
 
-The above file names, or the Python version may be slightly different for you. Make sure you use the correct version while using the commands above.
+## 5. Clone the opencv and opencv-contrib repo in the home directory
 
-Now, for the last step, make sure that you have `.venv` active using the command: `source .venv/bin/activate`. Then try to see if you have configured OpenCV correctly:
-
-```python
->> import cv2
->> cv2.__version__
+```bash
+cd ~
+git clone https://github.com/opencv/opencv.git
+git clone https://github.com/opencv/opencv_contrib.git
 ```
 
-If the above runs without errors, you have installed things correctly.
+If the clone for opencv is slow, download the zip from GitHub. Extract and rename the folder to opencv
 
-### Misc instructions if you have not compiled OpenCV yet
+Useful links when doing that:
 
-#### OpenCV compile CMake
+[https://itsfoss.com/mount-exfat/](https://itsfoss.com/mount-exfat/)
 
-```shell script
+## 6. Build OpenCV
+
+Install un-installed dependencies in Jetson Nano
+
+```bash
+sudo apt install python3-dev
+sudo apt-get install libjpeg-dev libpng-dev libtiff-dev
+sudo apt-get install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev
+sudo apt-get install libxvidcore-dev libx264-dev
+sudo apt-get install libgtk-3-dev
+sudo apt-get install libatlas-base-dev gfortran
+```
+
+```bash
+cd ~/opencv
+mkdir build
 cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D WITH_CUDA=ON \
 	-D CUDA_ARCH_PTX="" \
@@ -71,6 +87,61 @@ cmake -D CMAKE_BUILD_TYPE=RELEASE \
 	-D OPENCV_EXTRA_MODULES_PATH=/home/`whoami`/opencv_contrib/modules ..
 ```
 
+Now make OpenCV
+
+```bash
+# Use nproc to check no. of threads
+nproc
+# 4
+
+make -j4
+```
+
+Once its built, go to the botmlcode folder and symlink the built OpenCV python:
+
+```bash
+cd .venv/lib/python3.6/site-packages
+ln -s /home/clearbot/opencv/build/lib/python3/cv2.cpython-36m-aarch64-linux-gnu.so cv2.so
+```
+
+## 7. Getting the code prepared to run
+
+Pull the model data using Git LFS. In the botmlcode repo, run:
+
+```bash
+git lfs pull
+```
+
+### Note: In case Git LFS is not installed:
+
+Install Git LFS using:
+
+```bash
+sudo apt install git-lfs
+git lfs install
+```
+
+Next, install DroneKit and MAVProxy:
+
+References:
+
+[https://dronekit-python.readthedocs.io/en/latest/guide/quick_start.html](https://dronekit-python.readthedocs.io/en/latest/guide/quick_start.html)
+
+[https://brisbaneroboticsclub.id.au/connect-nvidia-nano-to-pixhawk/](https://brisbaneroboticsclub.id.au/connect-nvidia-nano-to-pixhawk/)
+
+```bash
+sudo apt install libxml2-dev libxslt1-dev
+# Make sure that you have activated the .venv using: $ source .venv/bin/activate
+pip install matplotlib lxml
+pip install future pymavlink mavproxy
+pip install dronekit dronekit-sitl
+```
+
+Install MQTT for ThingSpeak
+
+```bash
+pip install paho-mqtt
+```
 
 # Setup on the Jetson Nano board for Pixhawk
 
@@ -105,6 +176,21 @@ def __init__(self, connection_port="/dev/ttyTHS1", baud=57600):
 ````
 Thus we need to first initialize the `dronekit.connect()` and make it as a constructor  rather than repeatedly run the scripts so that we do not need to re run the script for everytime the [Dronekit attributes functions](https://dronekit-python.readthedocs.io/en/latest/guide/vehicle_state_and_parameters.html)
  get called.
+
+ # Main functionality
+
+ The intuition behind Botmlcode is to integrate Clearbot AI vision, Clearbot autonomous system, and the reporting system.
+
+ To run the botmlcode `main.py`, we have the flexibility to conifgure which AI model that we want to use by using `-m tiny or full`. moreover, we also have the option to generate the video out and actiavte the debug fucntion by indcating `-v True` and `--debug True` respectively.
+
+ There are two main function inside Botmlcode: 
+ - The first one is the Object detection feature where the functions returns a list of all objects that are detected and also the Angle between the object and the optical axis of the camera using `get_angle()` function explained on the `Angle Measurement section` below. 
+
+ - The second function is the `pixhawk_controller()`, make sure Jetson Nano is already configured with Pixhawk. the function return a Json log file where it consists of various data and status about the ClearBot such as the GPS location, velocity, battery status, and etc. 
+ 
+ Both functions runs using [Multiprocessing module](https://docs.python.org/3/library/multiprocessing.html) to prevent dependency as it will risk the performances of the AI model.  
+
+
 
  # Angle measurement 
  
